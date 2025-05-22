@@ -87,13 +87,13 @@ public class ForumController {
     }
 
     /*
-     * 新規投稿画面表示
+     * 編集画面表示
      */
     @GetMapping("/edit/{id}")
     public ModelAndView editContent(@PathVariable Integer id) {
         ModelAndView mav = new ModelAndView();
-        // form用の空のentityを準備
-        ReportForm reportForm = new ReportForm();
+        // idをもとにDBから投稿を入手する
+        ReportForm reportForm = reportService.editReport(id);
         // 画面遷移先を指定
         mav.setViewName("/edit");
         // 準備した空のFormを保管
@@ -102,11 +102,12 @@ public class ForumController {
     }
 
     /*
-     * 新規投稿処理
+     * 編集投稿処理
      */
-    @PostMapping("/update/{id}")
-    public ModelAndView updateContent(@ModelAttribute("formModel") ReportForm reportForm){
+    @PutMapping("/update/{id}")
+    public ModelAndView updateContent(@PathVariable Integer id,@ModelAttribute("formModel") ReportForm reportForm){
         // 投稿をテーブルに格納
+        reportForm.setId(id);
         reportService.saveReport(reportForm);
         // rootへリダイレクト
         return new ModelAndView("redirect:/");

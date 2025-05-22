@@ -25,11 +25,12 @@
                 <input type="submit" value="削除">
             </form>
         </div>
-        <div class="update-button">
-            <form th:action="@{/edit/{id}(id=${content.id})}" >
-                <input type="submit" value="編集">
-            </form>
+        <div class="edit-button">
+            <a th:href="@{/edit/{id}(id=${content.id})}">
+                <input type="button" value="編集">
+            </a>
         </div>
+
 
     </div>
 </div>
