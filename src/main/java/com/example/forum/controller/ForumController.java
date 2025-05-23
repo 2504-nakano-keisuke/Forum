@@ -2,7 +2,6 @@ package com.example.forum.controller;
 
 import com.example.forum.controller.form.CommentForm;
 import com.example.forum.controller.form.ReportForm;
-import com.example.forum.repository.ReportRepository;
 import com.example.forum.service.CommentService;
 import com.example.forum.service.ReportService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -110,6 +109,17 @@ public class ForumController {
     }
 
     /*
+     * 返信削除処理
+     */
+    @DeleteMapping("/comment/delete/{id}")
+    public ModelAndView deleteComment(@PathVariable Integer id) {
+        // 投稿をテーブルに格納
+        commentService.deleteComment(id);
+        // rootへリダイレクト
+        return new ModelAndView("redirect:/");
+    }
+
+    /*
      * 編集画面表示
      */
     @GetMapping("/edit/{id}")
@@ -125,6 +135,21 @@ public class ForumController {
     }
 
     /*
+     * コメント編集画面表示
+     */
+    @GetMapping("/comment/edit/{id}/{reportId}")
+    public ModelAndView editComment(@PathVariable Integer id,@PathVariable Integer reportId) {
+        ModelAndView mav = new ModelAndView();
+        // idをもとにDBから投稿を入手する
+        CommentForm commentForm = commentService.editComment(id);
+        // 画面遷移先を指定
+        mav.setViewName("/editComment");
+        // 準備した空のFormを保管
+        mav.addObject("formModel", commentForm);
+        return mav;
+    }
+
+    /*
      * 編集投稿処理
      */
     @PutMapping("/update/{id}")
@@ -132,6 +157,19 @@ public class ForumController {
         // 投稿をテーブルに格納
         reportForm.setId(id);
         reportService.saveReport(reportForm);
+        // rootへリダイレクト
+        return new ModelAndView("redirect:/");
+    }
+
+    /*
+     * 編集投稿処理
+     */
+    @PutMapping("/comment/update/{id}/{reportId}")
+    public ModelAndView updateComment(@PathVariable Integer id,@PathVariable Integer reportId,@ModelAttribute("formModel") CommentForm commentForm){
+        // 投稿をテーブルに格納
+        commentForm.setId(id);
+        commentForm.setReport_id(reportId);
+        commentService.saveComment(commentForm);
         // rootへリダイレクト
         return new ModelAndView("redirect:/");
     }
