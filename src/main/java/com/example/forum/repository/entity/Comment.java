@@ -6,13 +6,16 @@ import lombok.Data;
 import java.util.Date;
 
 @Entity
-@Table(name = "reports")
+@Table(name = "comments")
 @Data
-public class Report {
+public class Comment {
     @Id
     @Column
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+
+    @Column
+    private int report_id;
 
     @Column
     private String content;

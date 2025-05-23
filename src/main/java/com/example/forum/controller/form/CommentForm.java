@@ -5,9 +5,10 @@ import lombok.Data;
 import java.util.Date;
 
 @Data
-public class ReportForm {
+public class CommentForm {
 
     private int id;
+    private int report_id;
     private String content;
     private Date created_date;
 }
