@@ -6,6 +6,9 @@ import com.example.forum.repository.entity.Report;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,6 +22,31 @@ public class ReportService {
      */
     public List<ReportForm> findAllReport() {
         List<Report> results = reportRepository.findAllByOrderByIdDesc();
+        List<ReportForm> reports = setReportForm(results);
+        return reports;
+    }
+
+    /*
+     * レコード日付範囲取得処理
+     */
+    public List<ReportForm> findByCreated_dateReport(String start, String end) throws ParseException {
+
+        if (start == null || start.isEmpty()) {
+            start = "2020-01-01 00:00:00";
+        } else {
+            start += " 00:00:00";
+        }
+        if (end == null || end.isEmpty()) {
+            Timestamp currentTimestamp = new Timestamp(System.currentTimeMillis());
+            end = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(currentTimestamp);
+        } else {
+            end += " 23:59:59";
+        }
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        Timestamp startDate = Timestamp.valueOf(start);
+        Timestamp endDate = Timestamp.valueOf(end);
+        List<Report> results = reportRepository.findByCreatedDateBetween(startDate, endDate);
         List<ReportForm> reports = setReportForm(results);
         return reports;
     }

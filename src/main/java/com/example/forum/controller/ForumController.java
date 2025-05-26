@@ -5,10 +5,13 @@ import com.example.forum.controller.form.ReportForm;
 import com.example.forum.service.CommentService;
 import com.example.forum.service.ReportService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.text.ParseException;
+import java.util.Date;
 import java.util.List;
 
 @Controller
@@ -17,18 +20,17 @@ public class ForumController {
     ReportService reportService;
     @Autowired
     CommentService commentService;
-
     /*
      * 投稿内容表示処理
      */
     @GetMapping
-    public ModelAndView top() {
+    public ModelAndView top(@RequestParam(value="start", required = false)String start, @RequestParam(value = "end", required = false)String end) throws ParseException {
         ModelAndView mav = new ModelAndView();
         // 返信form用の空のentityを準備
         CommentForm commentForm = new CommentForm();
-        // 投稿を全件取得
-        List<ReportForm> reportData = reportService.findAllReport();
-        // 返信を全件取得
+        // 投稿を全件取得 日付検索に変えたい
+        List<ReportForm> reportData = reportService.findByCreated_dateReport(start, end);
+        // 返信を全件取得　日付検索に変えたい
         List<CommentForm> commentData = commentService.findAllComment();
         // 画面遷移先を指定
         mav.setViewName("/top");
@@ -36,6 +38,8 @@ public class ForumController {
         mav.addObject("formModel", commentForm);
         mav.addObject("reports", reportData);
         mav.addObject("comments", commentData);
+        mav.addObject("start", start);
+        mav.addObject("end", end);
 
         return mav;
     }
