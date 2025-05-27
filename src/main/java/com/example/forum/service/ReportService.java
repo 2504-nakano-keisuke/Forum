@@ -21,7 +21,7 @@ public class ReportService {
      * レコード全件取得処理
      */
     public List<ReportForm> findAllReport() {
-        List<Report> results = reportRepository.findAllByOrderByIdDesc();
+        List<Report> results = reportRepository.findAllByOrderByCreatedDateDesc();
         List<ReportForm> reports = setReportForm(results);
         return reports;
     }
@@ -46,7 +46,7 @@ public class ReportService {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         Timestamp startDate = Timestamp.valueOf(start);
         Timestamp endDate = Timestamp.valueOf(end);
-        List<Report> results = reportRepository.findByCreatedDateBetween(startDate, endDate);
+        List<Report> results = reportRepository.findByCreatedDateBetweenOrderByUpdatedDateDesc(startDate, endDate);
         List<ReportForm> reports = setReportForm(results);
         return reports;
     }

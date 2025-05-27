@@ -2,7 +2,10 @@ package com.example.forum.repository.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import org.hibernate.annotations.CurrentTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
+import java.sql.Timestamp;
 import java.util.Date;
 
 @Entity
@@ -18,6 +21,9 @@ public class Report {
     private String content;
 
     @Column(insertable = false, updatable = false, name="created_date")
-    private Date createdDate;
+    private Timestamp createdDate;
 
+    @UpdateTimestamp
+    @Column(insertable = false, name="updated_date")
+    private Timestamp updatedDate;
 }

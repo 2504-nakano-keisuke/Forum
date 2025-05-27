@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.w3.org/1999/xhtml" xmlns="http://www.w3.org/1999/html">
+<html xmlns:th="http://www.w3.org/1999/xhtml" xmlns="http://www.w3.org/1999/html" xmlns:fmt="http://java.sun.com/jsp/jstl/fmt">
 <head>
     <meta charset="UTF-8">
     <link th:href="@{/css/style.css}" rel="styleSheet">
@@ -24,6 +24,10 @@
         </div>
         <div class="text">
             投稿 : <span th:text="${report.content}"/>
+        </div>
+        <div class="date">
+            <fmt:formatDate value="${report.createdDate}"
+                            pattern="yyyy/MM/dd HH:mm:ss" />
         </div>
         <div class="delete-button">
             <form th:action="@{/delete/{id}(id=${report.id})}" th:method="delete">
@@ -60,7 +64,7 @@
                 <div class="form-area">
                     <label>返信</label>
                     <textarea class="tweet-box" th:field="*{content}" size="20" maxlength="200" /></textarea><br/>
-                    <input type="submit" value="投稿" />
+                    <input type="submit" value="返信" />
                 </div>
             </form>
         </div>

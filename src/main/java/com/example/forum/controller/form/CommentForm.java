@@ -10,5 +10,5 @@ public class CommentForm {
     private int id;
     private int report_id;
     private String content;
-    private Date created_date;
+    private Date createdDate;
 }

@@ -10,7 +10,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.sql.Timestamp;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -28,9 +30,9 @@ public class ForumController {
         ModelAndView mav = new ModelAndView();
         // 返信form用の空のentityを準備
         CommentForm commentForm = new CommentForm();
-        // 投稿を全件取得 日付検索に変えたい
+        // 投稿を全件取得 日付検索に変えた
         List<ReportForm> reportData = reportService.findByCreated_dateReport(start, end);
-        // 返信を全件取得　日付検索に変えたい
+        // 返信を全件取得
         List<CommentForm> commentData = commentService.findAllComment();
         // 画面遷移先を指定
         mav.setViewName("/top");
@@ -77,6 +79,10 @@ public class ForumController {
         // 投稿をテーブルに格納
         commentForm.setReport_id(reportId);
         commentService.saveComment(commentForm);
+        // idをもとにDBから投稿を入手する
+        ReportForm reportForm = reportService.editReport(reportId);
+        // 投稿のupdated_dateを更新
+        reportService.saveReport(reportForm);
         // rootへリダイレクト
         return new ModelAndView("redirect:/");
     }
@@ -170,10 +176,14 @@ public class ForumController {
      */
     @PutMapping("/comment/update/{id}/{reportId}")
     public ModelAndView updateComment(@PathVariable Integer id,@PathVariable Integer reportId,@ModelAttribute("formModel") CommentForm commentForm){
-        // 投稿をテーブルに格納
+        // 返信をテーブルに格納
         commentForm.setId(id);
         commentForm.setReport_id(reportId);
         commentService.saveComment(commentForm);
+        // idをもとにDBから投稿を入手する
+        ReportForm reportForm = reportService.editReport(reportId);
+        // 投稿のupdated_dateを更新
+        reportService.saveReport(reportForm);
         // rootへリダイレクト
         return new ModelAndView("redirect:/");
     }

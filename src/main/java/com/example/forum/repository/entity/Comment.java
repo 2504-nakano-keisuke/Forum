@@ -20,7 +20,7 @@ public class Comment {
     @Column
     private String content;
 
-    @Column(insertable = false, updatable = false)
-    private Date created_date;
+    @Column(insertable = false, updatable = false, name="created_date")
+    private Date createdDate;
 
 }
