@@ -64,6 +64,11 @@
                 <div class="form-area">
                     <label>返信</label>
                     <textarea class="tweet-box" th:field="*{content}" size="20" maxlength="200" /></textarea><br/>
+                    <div th:if="${mavErrorMessages != null} and ${reportId} == ${report.id}">
+                        <div th:each="message : ${mavErrorMessages}">
+                            <span th:text="${message}" class="errorMessages"/>
+                        </div>
+                    </div>
                     <input type="submit" value="返信" />
                 </div>
             </form>

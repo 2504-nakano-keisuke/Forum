@@ -21,7 +21,7 @@ public class ReportService {
      * レコード全件取得処理
      */
     public List<ReportForm> findAllReport() {
-        List<Report> results = reportRepository.findAllByOrderByCreatedDateDesc();
+        List<Report> results = reportRepository.findAllByOrderByUpdatedDateDesc();
         List<ReportForm> reports = setReportForm(results);
         return reports;
     }

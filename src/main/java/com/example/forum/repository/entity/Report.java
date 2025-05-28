@@ -2,11 +2,9 @@ package com.example.forum.repository.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import org.hibernate.annotations.CurrentTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.sql.Timestamp;
-import java.util.Date;
 
 @Entity
 @Table(name = "reports")

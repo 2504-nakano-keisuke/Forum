@@ -4,40 +4,53 @@ import com.example.forum.controller.form.CommentForm;
 import com.example.forum.controller.form.ReportForm;
 import com.example.forum.service.CommentService;
 import com.example.forum.service.ReportService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.sql.Timestamp;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
+@SessionAttributes(value= "errorMessages")
 public class ForumController {
     @Autowired
     ReportService reportService;
     @Autowired
     CommentService commentService;
+    @Autowired
+    HttpSession session;
     /*
      * 投稿内容表示処理
      */
     @GetMapping
-    public ModelAndView top(@RequestParam(value="start", required = false)String start, @RequestParam(value = "end", required = false)String end) throws ParseException {
+    public ModelAndView top(@RequestParam(value="start", required = false)String start,
+                            @RequestParam(value = "end", required = false)String end,
+                            HttpServletRequest request) throws ParseException {
         ModelAndView mav = new ModelAndView();
         // 返信form用の空のentityを準備
-        CommentForm commentForm = new CommentForm();
+        CommentForm commentsForm = new CommentForm();
         // 投稿を全件取得 日付検索に変えた
         List<ReportForm> reportData = reportService.findByCreated_dateReport(start, end);
         // 返信を全件取得
         List<CommentForm> commentData = commentService.findAllComment();
+        //エラーメッセージを取得
+        List<String> errorMessageForm = (List<String>) session.getAttribute("errorMessages");
+        Integer reportId = (Integer) session.getAttribute("reportId");
+        mav.addObject("mavErrorMessages", session.getAttribute("errorMessages"));
+        mav.addObject("reportId", session.getAttribute("reportId"));
+        session.invalidate();
         // 画面遷移先を指定
         mav.setViewName("/top");
         // 投稿データオブジェクトを保管
-        mav.addObject("formModel", commentForm);
+        mav.addObject("formModel", commentsForm);
         mav.addObject("reports", reportData);
         mav.addObject("comments", commentData);
         mav.addObject("start", start);
@@ -64,7 +77,12 @@ public class ForumController {
      * 新規投稿処理
      */
     @PostMapping("/add")
-    public ModelAndView addContent(@ModelAttribute("formModel") ReportForm reportForm){
+    public ModelAndView addContent(@Validated @ModelAttribute("formModel") ReportForm reportForm, BindingResult result){
+        if(result.hasErrors()) {
+            ModelAndView mav = new ModelAndView();
+            mav.setViewName("/new");
+            return mav;
+        }
         // 投稿をテーブルに格納
         reportService.saveReport(reportForm);
         // rootへリダイレクト
@@ -75,7 +93,18 @@ public class ForumController {
      * 返信投稿処理
      */
     @PostMapping("/comment/{reportId}")
-    public ModelAndView addComment(@ModelAttribute("formModel") CommentForm commentForm, @PathVariable Integer reportId){
+    public String addComment(@Validated @ModelAttribute("formModel") CommentForm commentForm,
+                             BindingResult result,
+                             @PathVariable Integer reportId){
+        if(result.hasErrors()) {
+            List<String> errorMessages = new ArrayList<String>();
+            for (FieldError error : result.getFieldErrors()) {
+                errorMessages.add(error.getDefaultMessage());
+            }
+            session.setAttribute("errorMessages", errorMessages);
+            session.setAttribute("reportId", reportId);
+            return "redirect:/";
+        }
         // 投稿をテーブルに格納
         commentForm.setReport_id(reportId);
         commentService.saveComment(commentForm);
@@ -84,17 +113,8 @@ public class ForumController {
         // 投稿のupdated_dateを更新
         reportService.saveReport(reportForm);
         // rootへリダイレクト
-        return new ModelAndView("redirect:/");
+        return "redirect:/";
     }
-
-    @GetMapping(value = "/sample")
-// 「name」というリクエストパラメータに紐づく値をsampleメソッドの引数nameに設定
-// "http://localhost:8080/sample?name=AAA" でアクセスすると、nameには「AAA」が設定される
-// "http://localhost:8080/sample" でアクセスすると、nameには「SAMPLE」が設定される
-    public String sample(@RequestParam(name = "name", defaultValue = "SAMPLE", required = false) String name) {
-        return name;
-    }
-
 
     /*
      * 投稿削除処理
@@ -163,7 +183,12 @@ public class ForumController {
      * 編集投稿処理
      */
     @PutMapping("/update/{id}")
-    public ModelAndView updateContent(@PathVariable Integer id,@ModelAttribute("formModel") ReportForm reportForm){
+    public ModelAndView updateContent(@PathVariable Integer id,@Validated @ModelAttribute("formModel") ReportForm reportForm, BindingResult result){
+        if(result.hasErrors()) {
+            ModelAndView mav = new ModelAndView();
+            mav.setViewName("/edit");
+            return mav;
+        }
         // 投稿をテーブルに格納
         reportForm.setId(id);
         reportService.saveReport(reportForm);
@@ -175,7 +200,12 @@ public class ForumController {
      * 編集投稿処理
      */
     @PutMapping("/comment/update/{id}/{reportId}")
-    public ModelAndView updateComment(@PathVariable Integer id,@PathVariable Integer reportId,@ModelAttribute("formModel") CommentForm commentForm){
+    public ModelAndView updateComment(@PathVariable Integer id,@PathVariable Integer reportId,@Validated @ModelAttribute("formModel") CommentForm commentForm, BindingResult result){
+        if(result.hasErrors()) {
+            ModelAndView mav = new ModelAndView();
+            mav.setViewName("/editComment");
+            return mav;
+        }
         // 返信をテーブルに格納
         commentForm.setId(id);
         commentForm.setReport_id(reportId);
