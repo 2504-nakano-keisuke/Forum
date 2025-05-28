@@ -42,8 +42,6 @@ public class ForumController {
         // 返信を全件取得
         List<CommentForm> commentData = commentService.findAllComment();
         //エラーメッセージを取得
-        List<String> errorMessageForm = (List<String>) session.getAttribute("errorMessages");
-        Integer reportId = (Integer) session.getAttribute("reportId");
         mav.addObject("mavErrorMessages", session.getAttribute("errorMessages"));
         mav.addObject("reportId", session.getAttribute("reportId"));
         session.invalidate();
